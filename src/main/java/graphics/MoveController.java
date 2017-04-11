@@ -15,17 +15,47 @@ import java.awt.event.KeyListener;
 public class MoveController implements KeyListener{
 
     boolean up, down, left, right, zup, zdown;
+    
+    int leftKey, upKey, rightKey, downKey, zInKey, zOutKey;
+    
     int kcode;
     
     public MoveController(){
-
         
         up = false;
         down = false;
         left = false;
         right =  false;
         
+        leftKey = 37;
+        upKey = 38;
+        rightKey = 39;
+        downKey = 40;
+        
+        zInKey = 73;
+        zOutKey = 79;
+        
     }
+    public MoveController(char lC, char uC, char rC, char dC){
+        
+        this();
+        leftKey = KeyEvent.getExtendedKeyCodeForChar(lC);
+        rightKey = KeyEvent.getExtendedKeyCodeForChar(rC);
+        upKey = KeyEvent.getExtendedKeyCodeForChar(uC);
+        downKey = KeyEvent.getExtendedKeyCodeForChar(dC);
+        
+    }
+    
+    public MoveController(char lC, char uC, char rC, char dC, char zIC, char zOC){
+        
+        this(lC, uC, rC, dC);
+        zInKey = KeyEvent.getExtendedKeyCodeForChar(zIC);
+        zOutKey = KeyEvent.getExtendedKeyCodeForChar(zOC);
+        
+    }
+    
+    
+    
     
     
     public int[] getVector(){
@@ -44,7 +74,6 @@ public class MoveController implements KeyListener{
             vec[2]--;
         return vec;
     }
-    
     @Override
     public void keyTyped(KeyEvent ke) {
       
@@ -55,27 +84,27 @@ public class MoveController implements KeyListener{
         
         int k = ke.getKeyCode();
     
-        if(k==37||k==65){
+        if(k == leftKey){
             left = true;
             kcode = k;
         }
-        else if(k==38||k==87){
+        else if(k == upKey){
             up = true;
             kcode = k;
         }
-        else if(k==39||k==68){
+        else if(k == rightKey){
             right = true;
             kcode = k;
         }
-        else if(k==40||k==83){
+        else if(k == downKey){
             down = true;
             kcode = k;
         }
-        else if(k==73){
+        else if(k == zInKey){
             zdown=true;
             kcode = k;
         }
-        else if(k==79){
+        else if(k == zOutKey){
             
             zup = true;
             kcode = k;

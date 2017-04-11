@@ -5,11 +5,14 @@
  */
 package graphics;
 
+import entity.Entity;
 import entity.EvoObject;
 import environment.World;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.geom.Ellipse2D;
 import static java.lang.Thread.sleep;
 import java.util.ArrayList;
@@ -22,14 +25,14 @@ import javax.swing.JPanel;
  *
  * @author General
  */
-public class WorldPanel extends JPanel implements Runnable{
+public class WorldPanel extends JPanel implements Runnable, ComponentListener{
     
     int[] vSize;
     int[] vLoc;
     int movePower = 2;
     int zoomPower = 5;
-    public final int WIDTH = 500;
-    public final int HEIGHT = 500;
+    public int WIDTH = 500;
+    public int HEIGHT = 500;
     private MoveController mc;
     ArrayList<EvoObject> eObjects;
     World w;
@@ -67,6 +70,11 @@ public class WorldPanel extends JPanel implements Runnable{
             //System.out.println(Arrays.toString(sSize));
             Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
             g2d.fill(circle);
+            if(eObj instanceof Entity){
+                g2d.drawString("Hunger :"+((Entity) eObj).getHunger(), sLoc[0]+25, sLoc[1]-25);
+            }
+
+            
           //  System.out.println(Arrays.toString(sLoc)+" : "+eObj);
         }
        
@@ -133,6 +141,26 @@ public class WorldPanel extends JPanel implements Runnable{
       
         
     }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        HEIGHT = e.getComponent().getHeight();
+        WIDTH = e.getComponent().getWidth();
+        vSize[0] = WIDTH;
+        vSize[1] = HEIGHT;
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+          }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+           }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+           }
     
     
 }

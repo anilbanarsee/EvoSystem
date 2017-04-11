@@ -12,6 +12,7 @@ package entity;
 public class EvoObject {
     protected int[] location;
     protected int[] size;
+    protected String name = "";
     
     public EvoObject(int[] loc){
         location = new int[2];
@@ -29,5 +30,8 @@ public class EvoObject {
     }
     public boolean tick(){
         return true;
+    }
+    public String getName(){
+        return name;
     }
 }

@@ -16,21 +16,29 @@ import util.MathUtils;
  */
 public class World {
     
+
     private ArrayList<EvoObject> eObjects;
+    private ArrayList<Entity> graveyard;
+
     private int[] worldSize;
     
     public World(){
         eObjects = new ArrayList<>();
+        graveyard = new ArrayList<>();
         worldSize = new int[2];
         worldSize[0] = 2000;
         worldSize[1] = 2000;
     }
     
-    public void addEntity(Entity e){
+    public void addObject(EvoObject e){
         eObjects.add(e);
     }
+    
     public ArrayList<EvoObject> getObjects(){
         return eObjects;
+    }
+    public ArrayList<Entity> getGraveyard(){
+        return graveyard;
     }
     public ArrayList<EvoObject> getObjects(int[] p1, int[] p2){
         ArrayList<EvoObject> eObjs = new ArrayList<>();
@@ -128,15 +136,24 @@ public class World {
             
            
         }
-        System.out.println(eObjs.size());
         return eObjs;
         
     }
     public void tick(){
         for(EvoObject e: eObjects){
-            if(!e.tick()){
-                eObjects.remove(e);
-                return;
+            
+            if(e instanceof Entity){
+                Entity ent = (Entity) e;
+                if(!ent.tick()){
+                    eObjects.remove(e);
+                    graveyard.add(ent);
+                    return;
+                }
+                if(ent.getLoc()[0]>100){
+                    
+                    ent.modHunger(-1);
+                    
+                }
             }
         }
     }
