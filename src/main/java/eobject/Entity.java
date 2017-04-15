@@ -51,6 +51,7 @@ public class Entity extends EvoObject {
     public Entity(int[] loc, float radius, World w){
         super(loc, radius);
         sensors = new ArrayList<>();
+        eyes = new ArrayList<>();
         this.w = w;
         angle = 0;
         hunger = 100;
@@ -76,6 +77,11 @@ public class Entity extends EvoObject {
             Sensor s = new Sensor(this, i, 100, Food.class);
             sensors.add(s);
         }
+        
+    }
+    public void setupDefaultEyes(){
+        Eye eye = new Eye(this, 100, 50, 0);
+        eyes.add(eye);
         
     }
     public void setDead(boolean b){

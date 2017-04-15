@@ -16,6 +16,8 @@
  */
 package eobject;
 
+import util.MathUtils;
+
 /**
  *
  * @author Reetoo
@@ -32,7 +34,7 @@ public class Eye {
     Entity entity;
     
     
-    private Eye(Entity entity, double viewDistance, double splitAngle, double angle){
+    public Eye(Entity entity, double viewDistance, double splitAngle, double angle){
         this.entity = entity;
         this.splitAngle = splitAngle;
         this.viewDistance = viewDistance;
@@ -41,14 +43,23 @@ public class Eye {
     }
 
 
-    public double[][] getVectors(){
+    public double[][][] getVectors(){
        
         double[][][] vectors = new double[2][2][];
         
         double[] cntr = entity.getLoc();
         
+       
+        for(int i=0; i<2; i++){
+            double a = angle-(splitAngle/2);
+            for(int j=0; j<2; j++){
+                double[] p = MathUtils.getEndPointOfVector(cntr, a, viewDistance);
+                vectors[i][j] = p;
+                a += splitAngle;
+            }
+        }     
 
-        return null;
+        return vectors;
         
     }
     

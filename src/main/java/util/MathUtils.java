@@ -17,6 +17,25 @@ public class MathUtils {
         System.out.println(between(2,3,10));
         System.out.println(between(2,10,3));
     }
+    public static double[] getEndPointOfVector(double[] p, double angle, double length){
+        
+        double[] vec = new double[2];
+        
+        double dx = length*Math.sin(angle);
+        double dy = length*Math.cos(angle);
+        
+        vec[0] += dx;
+        vec[1] += dy;
+        
+        return vec;
+    }
+    public static double getAngleToNormal(double[] p1, double[] p2){
+        
+        double vecLength = getDistanceBetween(p1,p2);
+        
+        return Math.toDegrees(Math.acos(p2[1]/vecLength));
+        
+    }
     public static double getDistanceBetween(double[] p1, double[] p2){
         
         
