@@ -16,6 +16,15 @@
  */
 package simulation;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Scanner;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 import org.encog.neural.hyperneat.substrate.Substrate;
 import org.encog.neural.hyperneat.substrate.SubstrateFactory;
@@ -31,7 +40,51 @@ public class TrainTest {
     
     public static void main(String[] args){
         
-        Substrate substrate = SubstrateFactory.factorSandwichSubstrate(4, 4);
+        
+        /*JFrame frame = new JFrame("Training Information");
+        frame.setSize(300,300);
+        frame.setVisible(true);
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        
+        GridBagConstraints c = new GridBagConstraints();
+        
+        JLabel iterationLabel = new JLabel();
+        JLabel numSpeciesLabel = new JLabel();
+        JLabel bestScoreLabel = new JLabel();
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        panel.add(iterationLabel,c);
+        
+        c.gridx = 0;
+        c.gridy = 1;
+        panel.add(numSpeciesLabel,c);
+        
+        c.gridy = 2;
+        panel.add(bestScoreLabel,c);
+        
+        JButton startSimButton = new JButton("Start Simulation");
+        c.gridwidth = 0;
+        c.gridx = 0;
+        c.gridy = 3;
+        
+        startSimButton.addActionListener(new ActionListener() { 
+            public void actionPerformed(ActionEvent e) { 
+                
+            } 
+        });
+        
+        panel.add(startSimButton,c);
+        
+        frame.add(panel);
+        */
+        
+        Substrate substrate = SubstrateFactory.factorSandwichSubstrate(16, 4);
+        System.out.println(substrate.getInputCount());
+        System.out.println(substrate.getOutputCount());
         EntityScore score = new EntityScore();
         
         NEATPopulation pop = new NEATPopulation(substrate, 500);
@@ -41,6 +94,31 @@ public class TrainTest {
         OriginalNEATSpeciation speciation = new OriginalNEATSpeciation();
         speciation.setCompatibilityThreshold(1);
         train.setSpeciation(speciation = new OriginalNEATSpeciation());
+        
+        
+        while(true){
+            
+            train.iteration();
+            
+            System.out.println(train.getIteration());
+           
+            if((train.getIteration()%10)==0){
+                
+                System.out.println("ITERATION :"+train.getIteration());
+                System.out.println("NUM SPECIES:"+pop.getSpecies().size());
+                System.out.println("BEST SCORE:"+pop.getBestGenome().getScore());
+                
+        /*iterationLabel.setText("ITERATION :"+train.getIteration());
+        numSpeciesLabel.setText("NUM SPECIES:"+pop.getSpecies().size());
+        bestScoreLabel.setText("BEST SCORE:"+pop.getBestGenome().getScore());*/
+       
+                
+            }
+            
+        }
+        
+        
+        
         
     
     }

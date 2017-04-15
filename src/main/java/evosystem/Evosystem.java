@@ -5,11 +5,13 @@
  */
 package evosystem;
 
-import entity.Entity;
+import eobject.Entity;
 import environment.World;
+import eobject.Food;
 import framework.Processor;
 import graphics.MoveController;
 import graphics.WorldPanel;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -32,9 +34,24 @@ public class Evosystem {
         //w.addEntity(new Entity(loc,20));
         loc[0] = 200;
         //w.addEntity(new Entity(loc,100));
-        loc[1] = 600;
+        loc[1] = 200;
         
-        Entity e1 = new Entity(loc,1000);
+        Entity e1 = new Entity(loc,25,500, w);
+        e1.setupDefaultSensors();
+        
+        Random r = new Random();
+        
+        int numFood = 30;
+        
+        for(int i=0; i<numFood; i++){
+            int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
+
+            Food f = new Food(fLoc, 5);
+            f.setName("Food_"+i);
+            w.addObject(f);
+        }
+        
+        
         w.addObject(e1);
         e1.setName("Entity_1");
         JFrame frame = new JFrame();

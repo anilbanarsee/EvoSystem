@@ -17,6 +17,15 @@ public class MathUtils {
         System.out.println(between(2,3,10));
         System.out.println(between(2,10,3));
     }
+    public static double getDistanceBetween(double[] p1, double[] p2){
+        
+        
+        double a = p1[0]-p2[0];
+        double b = p1[1]-p2[1];
+        
+        return Math.sqrt((a*a)+(b*b));
+        
+    }
     public static boolean between(int t, int x, int y){
         if(x<y){
             return (t<y && t>x);
@@ -25,5 +34,22 @@ public class MathUtils {
             return (t>y && t<x);
         }
     }
+    public static boolean between(double t, int x, int y){
+        if(x<y){
+            return (t<y && t>x);
+        }
+        else{
+            return (t>y && t<x);
+        }
+    }
+        public static boolean between(double t, double x, double y){
+        if(x<y){
+            return (t<y && t>x);
+        }
+        else{
+            return (t>y && t<x);
+        }
+    }
+    
     
 }

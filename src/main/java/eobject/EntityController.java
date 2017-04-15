@@ -14,38 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package simulation;
-
-import org.encog.ml.CalculateScore;
-import org.encog.ml.MLMethod;
-import org.encog.neural.neat.NEATNetwork;
+package eobject;
 
 /**
  *
  * @author Reetoo
  */
-public class EntityScore implements CalculateScore{
-
-    public EntityScore(){
+public class EntityController {
+    
+    
+    boolean left, right, forward, back;
+    
+    
+    public void setVector(int[] vec){
+        
+        
         
     }
     
-    @Override
-    public double calculateScore(MLMethod phenotype) {
-        
-        return Simulation.simulate(phenotype);
-        
-        
-    }
-
-    @Override
-    public boolean shouldMinimize() {
-        return false;
-    }
-
-    @Override
-    public boolean requireSingleThreaded() {
-        return false;
-    }
     
 }

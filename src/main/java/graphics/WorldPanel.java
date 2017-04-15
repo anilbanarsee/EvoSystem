@@ -5,11 +5,16 @@
  */
 package graphics;
 
-import entity.Entity;
-import entity.EvoObject;
+import eobject.Entity;
+import eobject.EvoObject;
 import environment.World;
+import eobject.Food;
+import eobject.Sensor;
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -47,6 +52,24 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         vLoc[0] = 0;
         vLoc[1] = 0;
     } 
+    public double[] convertPointToViewport(double[] vec){
+            
+        double[] sLoc = new double[2];
+        sLoc[0] = vec[0]-vLoc[0];
+        sLoc[1] = vec[1]-vLoc[1];
+        sLoc[0] = (int) Math.round(sLoc[0]*(this.getWidth()/(vSize[0]+0.0)));
+        sLoc[1] = (int) Math.round(sLoc[1]*(this.getHeight()/(vSize[1]+0.0)));
+        
+        return sLoc;
+    }
+    public double[] convertVectorToViewport(double[] vec){
+        double[] V = {vec[0], vec[1]};
+        
+        V[0] = (int) Math.round(V[0]*(this.getWidth()/(vSize[0]+0.0)));
+        V[1] = (int) Math.round(V[1]*(this.getHeight()/(vSize[1]+0.0)));
+        
+        return V;
+    }
     @Override
     public void paintComponent(Graphics g){
        // System.out.println(this.getWidth());
@@ -54,24 +77,50 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         Graphics2D g2d = (Graphics2D) g;
         
         for(EvoObject eObj : eObjects){
-            int[] sLoc = new int[2];
-            sLoc[0] = eObj.getLoc()[0]-vLoc[0];
-            sLoc[1] = eObj.getLoc()[1]-vLoc[1];
-            //System.out.print(sLoc[0]+","+sLoc[1]+" = ");
-            sLoc[0] = (int) Math.round(sLoc[0]*(this.getWidth()/(vSize[0]+0.0)));
-            sLoc[1] = (int) Math.round(sLoc[1]*(this.getHeight()/(vSize[1]+0.0)));
-            //System.out.println(sLoc[0]+","+sLoc[1]);
+            double[] sLoc = convertPointToViewport(eObj.getLoc());
             
-            int[] sSize = {50,50};
-            sSize[0] = (int) Math.round(sSize[0]*(this.getWidth()/(vSize[0]+0.0)));
-            sSize[1] = (int) Math.round(sSize[1]*(this.getHeight()/(vSize[1]+0.0)));
-            
+            double[] sSize = {50,50};
+            sSize = convertVectorToViewport(sSize);
             
             //System.out.println(Arrays.toString(sSize));
-            Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
-            g2d.fill(circle);
+            
             if(eObj instanceof Entity){
-                g2d.drawString("Hunger :"+((Entity) eObj).getHunger(), sLoc[0]+25, sLoc[1]-25);
+                Entity ent = (Entity) eObj;
+
+                ArrayList<Sensor> sensors = ent.getSensors();
+                
+                for(Sensor s: sensors){
+                    if(s.getFade()>0){
+                        int red = (int) Math.round(155*(s.getFade()/Sensor.FADE_START));
+                        g2d.setColor(new Color(100+red,100,100));
+                    }
+                    else{
+                        g2d.setColor(Color.DARK_GRAY);
+                    }
+                    double[][] coords = s.getCoordinates();
+                    double[] P1 = convertPointToViewport(coords[0]);
+                    double[] P2 = convertPointToViewport(coords[1]);
+                    g2d.setStroke(new BasicStroke(4));
+                    g2d.drawLine((int) Math.round(P1[0]), (int) Math.round(P1[1]),(int)  Math.round(P2[0]),(int)  Math.round(P2[1]));
+                    g2d.setStroke(new BasicStroke(1));
+                    
+                }
+                g2d.setColor(Color.BLACK);
+                Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
+                g2d.fill(circle);
+                g2d.drawString("Hunger :"+ent.getHunger(), (float) sLoc[0]+25,  (float) sLoc[1]-25);
+                g2d.drawString("Angle :"+ent.getAngle(), (float)sLoc[0]+25, (float)sLoc[1]+25);
+                circle = new Ellipse2D.Double((sLoc[0])+(50*Math.sin(Math.toRadians(ent.getAngle()))), (sLoc[1])+(50*Math.cos(Math.toRadians(ent.getAngle()))), 5, 5);
+                g2d.fill(circle);
+                
+            }
+            if(eObj instanceof Food){
+                g2d.setColor(Color.BLUE);
+                sSize[0] = 10; sSize[1] = 10;
+                g2d.drawString(eObj.getName(), (float) sLoc[0]+10, (float) sLoc[1]-10);
+                Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
+                g2d.fill(circle);
+                g2d.setColor(Color.DARK_GRAY);
             }
 
             
@@ -134,7 +183,7 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         p2[0] = p1[0]+vSize[0];
         p2[1] = p1[1]+vSize[1];
         
-        eObjects = w.getObjects(p1, p2);
+        eObjects = w.getObjectsInArea(p1, p2);
         
         
         repaint();

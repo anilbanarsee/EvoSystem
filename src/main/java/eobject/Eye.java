@@ -14,24 +14,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package entity;
+package eobject;
 
 /**
  *
  * @author Reetoo
  */
-public class EntityBrain {
+public class Eye {
+    
+    double viewDistance;
+    double splitAngle;
+    double angle;
+    
+    double lastSeenAngle;
+    double lastSeenDistance;
     
     Entity entity;
     
-    public EntityBrain(Entity e){
-        entity = e;
+    
+    private Eye(Entity entity, double viewDistance, double splitAngle, double angle){
+        this.entity = entity;
+        this.splitAngle = splitAngle;
+        this.viewDistance = viewDistance;
+        this.angle = angle;
+     
+    }
+
+
+    public double[][] getVectors(){
+       
+        double[][][] vectors = new double[2][2][];
+        
+        double[] cntr = entity.getLoc();
+        
+
+        return null;
+        
     }
     
-    public int[] getDecision(){
-        int[] vector = new int[2];
-        return null;
-    }
     
     
 }

@@ -5,8 +5,9 @@
  */
 package environment;
 
-import entity.Entity;
-import entity.EvoObject;
+import eobject.Entity;
+import eobject.EvoObject;
+import eobject.Food;
 import java.util.ArrayList;
 import util.MathUtils;
 
@@ -40,13 +41,51 @@ public class World {
     public ArrayList<Entity> getGraveyard(){
         return graveyard;
     }
-    public ArrayList<EvoObject> getObjects(int[] p1, int[] p2){
+    public ArrayList<EvoObject> getObjectsInLine(double[] loc, double angle, float distance){
+        
+        double[] P1 = {loc[0], loc[1]};
+        double[] P2 = {loc[0]+(distance*Math.sin(angle)),loc[1]+(distance*Math.cos(angle))};
+        
+        ArrayList<EvoObject> eObjs = new ArrayList<>();
+        
+        for(EvoObject eObj: getObjectsInRadius(loc, distance)){
+            
+            double x0 = eObj.getLoc()[0];
+            double y0 = eObj.getLoc()[1];
+            
+            double dx = ((P2[1]-P1[1])*x0)-((P2[0]-P1[0])*y0)+(P2[0]*P1[1])-(P2[1]*P1[0]);
+            
+            if(dx<0) dx = dx*-1;
+            
+            dx = dx/Math.sqrt(((P2[1]-P1[1])*(P2[1]-P1[1]))+((P2[0]-P1[0])*(P2[0]-P1[0])));
+            
+            if(dx<(eObj.getRadius())){
+                if(MathUtils.between(x0, P1[0], P2[0])||MathUtils.between(y0, P1[1], P2[1]))
+                    eObjs.add(eObj);
+            }
+            
+        }
+        return eObjs;
+        
+    }
+    public ArrayList<EvoObject> getObjectsInRadius(double[] loc, float radius){
+        ArrayList<EvoObject> eObjs = new ArrayList<>();
+        for(EvoObject eObj: eObjects){
+            double[] tloc = eObj.getLoc();
+            double distance = Math.sqrt(((loc[0]-tloc[0])*(loc[0]-tloc[0]))+((loc[1]-tloc[1])*(loc[1]-tloc[1])));
+            if(distance<(eObj.getRadius()+radius)){
+                eObjs.add(eObj);
+            }
+        }
+        return eObjs;
+    }
+    public ArrayList<EvoObject> getObjectsInArea(int[] p1, int[] p2){
         ArrayList<EvoObject> eObjs = new ArrayList<>();
         int x = 0;
         for(EvoObject eObj : eObjects){
             x++;
             //System.out.print(x +" :");
-            int[] loc = eObj.getLoc();
+            double[] loc = eObj.getLoc();
             int[] size = eObj.getSize();
             if(MathUtils.between(loc[0], p1[0], p2[0])){
                 if(MathUtils.between(loc[1],p1[1],p2[1]))
@@ -119,11 +158,11 @@ public class World {
                     }
                     
                 }
-                int dX = corner[0]-loc[0];
+                double dX = corner[0]-loc[0];
                 if(dX<0)
                     dX = dX*-1;
                 
-                int dY = corner[1]-loc[1];
+                double dY = corner[1]-loc[1];
                 if(dY<0)
                     dY = dY*-1;
                 //System.out.println(dX+","+dY);
@@ -140,21 +179,28 @@ public class World {
         
     }
     public void tick(){
+        ArrayList<EvoObject> bin = new ArrayList<>();
         for(EvoObject e: eObjects){
             
             if(e instanceof Entity){
                 Entity ent = (Entity) e;
                 if(!ent.tick()){
-                    eObjects.remove(e);
+                    bin.add(e);
                     graveyard.add(ent);
-                    return;
+                    ent.setDead(true);
                 }
-                if(ent.getLoc()[0]>100){
-                    
-                    ent.modHunger(-1);
-                    
+                ArrayList<EvoObject> eObjs = this.getObjectsInRadius(ent.getLoc(), ent.getRadius());
+                for(EvoObject eb: eObjs){
+                    if(eb instanceof Food){
+                        bin.add(eb);
+                        ent.modHunger(100);
+                    }
                 }
+                ent.modHunger(-1);
             }
+        }
+        for(EvoObject e: bin){
+            eObjects.remove(e);
         }
     }
     

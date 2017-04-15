@@ -3,26 +3,34 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package eobject;
 
 /**
  *
  * @author General
  */
 public class EvoObject {
-    protected int[] location;
+    protected double[] location;
     protected int[] size;
+    protected float radius;
     protected String name = "";
     
-    public EvoObject(int[] loc){
-        location = new int[2];
+    public EvoObject(int[] loc, float radius){
+        location = new double[2];
         location[0] = loc[0];
         location[1] = loc[1];
         size = new int[2];
         size[0] = 50;
         size[1] = 50;
+        this.radius = radius;
     }
-    public int[] getLoc(){
+        public void setName(String name){
+        this.name = name;
+    }
+    public float getRadius(){
+        return radius;
+    }
+    public double[] getLoc(){
         return location;
     }
     public int[] getSize(){
@@ -33,5 +41,8 @@ public class EvoObject {
     }
     public String getName(){
         return name;
+    }
+    public String toString(){
+        return getName();
     }
 }
