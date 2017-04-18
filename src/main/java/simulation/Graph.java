@@ -14,34 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package eobject;
+package simulation;
 
 /**
  *
  * @author Reetoo
  */
-public class Food extends EvoObject{
-
-    boolean inVision;
-    boolean isPoison;
-    
-    public Food(int[] loc, float radius, boolean isPoison) {
-        super(loc, radius);
-        this.isPoison = isPoison;
-    }
-    
-    public void setInVision(boolean set){
-        inVision = set;
-    }
-    public boolean isInVision(){
-        return inVision;
-    }
-    public boolean isPoison(){
-        return isPoison;
-    }
-    public String toString(){
-        return name;
-    }
-    
+public class Graph {
     
 }

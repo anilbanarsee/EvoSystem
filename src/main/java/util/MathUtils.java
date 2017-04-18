@@ -5,6 +5,9 @@
  */
 package util;
 
+import eobject.Food;
+import java.util.Arrays;
+
 /**
  *
  * @author General
@@ -12,28 +15,89 @@ package util;
 public class MathUtils {
     
     public static void main(String[] args){
-        System.out.println(between(5,10,2));
-        System.out.println(between(5,2,10));
-        System.out.println(between(2,3,10));
-        System.out.println(between(2,10,3));
+        
+        double[] array = {1,2,3,4,5};
+        System.out.println(Arrays.toString(insertIntoFixedArray(array, 7, 3)));
+
+    }
+    public static boolean betweenAngles(double test, double a1, double a2){
+        
+        double x = (test+a1)%360;
+        return x<=a2;
+        
+    }
+    public static Food[] insertIntoFixedArray(Food[] target, Food value, int index){
+        
+        Food[] newArray = new Food[target.length];
+        int nIndex = 0;
+        
+        for(int i=0; i<newArray.length; i++){
+            
+            if(i==index){
+                newArray[i] = value;
+            }
+            else{
+                newArray[i] = target[nIndex];
+                nIndex++;
+            }
+        }
+        return newArray;
+    }
+            public static boolean[] insertIntoFixedArray(boolean[] target, boolean value, int index){
+        
+        boolean[] newArray = new boolean[target.length];
+        int nIndex = 0;
+        
+        for(int i=0; i<newArray.length; i++){
+            
+            if(i==index){
+                newArray[i] = value;
+            }
+            else{
+                newArray[i] = target[nIndex];
+                nIndex++;
+            }
+        }
+        return newArray;
+    }
+        public static double[] insertIntoFixedArray(double[] target, double value, int index){
+        
+        double[] newArray = new double[target.length];
+        int nIndex = 0;
+        
+        for(int i=0; i<newArray.length; i++){
+            
+            if(i==index){
+                newArray[i] = value;
+            }
+            else{
+                newArray[i] = target[nIndex];
+                nIndex++;
+            }
+        }
+        return newArray;
     }
     public static double[] getEndPointOfVector(double[] p, double angle, double length){
         
         double[] vec = new double[2];
         
-        double dx = length*Math.sin(angle);
-        double dy = length*Math.cos(angle);
+        double dx = length*Math.sin(Math.toRadians(angle));
+        double dy = length*Math.cos(Math.toRadians(angle));
         
-        vec[0] += dx;
-        vec[1] += dy;
+        vec[0] = dx+p[0];
+        vec[1] = dy+p[1];
         
         return vec;
     }
     public static double getAngleToNormal(double[] p1, double[] p2){
         
         double vecLength = getDistanceBetween(p1,p2);
+        double dot = p2[1]-p1[1];
+        double det = p2[0]-p1[0];
         
-        return Math.toDegrees(Math.acos(p2[1]/vecLength));
+        double ans = Math.toDegrees(Math.atan2(det, dot));
+
+        return ans;
         
     }
     public static double getDistanceBetween(double[] p1, double[] p2){

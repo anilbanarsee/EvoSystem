@@ -79,6 +79,17 @@ public class World {
         }
         return eObjs;
     }
+    public ArrayList<EvoObject> getObjectsInRadius(double[] loc, double radius){
+        ArrayList<EvoObject> eObjs = new ArrayList<>();
+        for(EvoObject eObj: eObjects){
+            double[] tloc = eObj.getLoc();
+            double distance = Math.sqrt(((loc[0]-tloc[0])*(loc[0]-tloc[0]))+((loc[1]-tloc[1])*(loc[1]-tloc[1])));
+            if(distance<(eObj.getRadius()+radius)){
+                eObjs.add(eObj);
+            }
+        }
+        return eObjs;
+    }
     public ArrayList<EvoObject> getObjectsInArea(int[] p1, int[] p2){
         ArrayList<EvoObject> eObjs = new ArrayList<>();
         int x = 0;
@@ -181,7 +192,9 @@ public class World {
     public void tick(){
         ArrayList<EvoObject> bin = new ArrayList<>();
         for(EvoObject e: eObjects){
-            
+            if(e instanceof Food){
+                ((Food) e).setInVision(false);
+            }
             if(e instanceof Entity){
                 Entity ent = (Entity) e;
                 if(!ent.tick()){
@@ -192,12 +205,21 @@ public class World {
                 ArrayList<EvoObject> eObjs = this.getObjectsInRadius(ent.getLoc(), ent.getRadius());
                 for(EvoObject eb: eObjs){
                     if(eb instanceof Food){
-                        bin.add(eb);
-                        ent.modHunger(100);
+                       Food f = (Food) eb;
+                       bin.add(eb);
+                       if(!f.isPoison()){
+                           ent.modHunger(500);
+                           
+                       }
+                       else{
+                           ent.modScore(-5000);
+                           ent.modHunger(-500);
+                       }
                     }
                 }
                 ent.modHunger(-1);
             }
+           
         }
         for(EvoObject e: bin){
             eObjects.remove(e);

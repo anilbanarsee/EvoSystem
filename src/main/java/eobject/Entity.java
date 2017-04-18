@@ -22,9 +22,8 @@ public class Entity extends EvoObject {
     double power;
     
     double hunger;
-    double maturity;
     
-    double hungerCap;
+    public double hungerCap;
     double matRate;
     
     double angle;
@@ -55,6 +54,7 @@ public class Entity extends EvoObject {
         this.w = w;
         angle = 0;
         hunger = 100;
+        hungerCap = Double.POSITIVE_INFINITY;
         score = 0;
         brain = null;
         isDead = false;
@@ -80,9 +80,25 @@ public class Entity extends EvoObject {
         
     }
     public void setupDefaultEyes(){
-        Eye eye = new Eye(this, 100, 50, 0);
+        Eye eye = new Eye(this, 300, 50, 0);
         eyes.add(eye);
         
+    }
+    public void setupDefaultEyes(int max){
+        Eye eye = new Eye(this, 300, 50, 0, max);
+        eyes.add(eye);
+        
+    }
+    public void addEye(Eye eye){
+        eyes.add(eye);
+    }
+    public void addSensor(Sensor s){
+        sensors.add(s);
+    }
+
+
+    public ArrayList<Eye> getEyes(){
+        return eyes;
     }
     public void setDead(boolean b){
         isDead = b;
@@ -109,11 +125,13 @@ public class Entity extends EvoObject {
     public int getScore(){
         return score;
     }
-    
+    public void modScore(int mod){
+        score = score+mod;
+    }
     public ArrayList<Sensor> getSensors(){
         return sensors;
     }
-    
+
     @Override
     public boolean tick(){
         if(hunger<=0){
@@ -126,7 +144,10 @@ public class Entity extends EvoObject {
             s.detect();
             
         }
-        int[] vec = new int[4];
+        for(Eye e: eyes){
+            e.detect();
+        }
+        int[] vec = new int[2];
         
         if(controller!=null){
             vec = controller.getVector();           
@@ -137,10 +158,23 @@ public class Entity extends EvoObject {
         
         angle += (vec[0]*TURNRATE);
         angle = angle%360;
+        /*if(angle<0){
+            angle = angle+360;
+        }*/
             
         for(Sensor s: sensors){
             s.angle+=(vec[0]*TURNRATE);
             s.angle = s.angle%360;
+            /*if(s.angle<0){
+                s.angle = s.angle+360;
+            }*/
+        }
+        for(Eye e: eyes){
+            e.angle += (vec[0]*TURNRATE);
+            e.angle = e.angle%360;
+            /*if(e.angle<0){
+                e.angle = e.angle+360;
+            }*/
         }
             
         if(vec[1]!=0){
@@ -159,6 +193,10 @@ public class Entity extends EvoObject {
     }
     public void modHunger(int n){
         hunger += n;
+        
+        if(hunger>hungerCap){
+            hunger = hungerCap;
+        }
     }
     @Override
     public String toString(){

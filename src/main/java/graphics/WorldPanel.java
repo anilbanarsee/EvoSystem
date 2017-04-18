@@ -8,6 +8,7 @@ package graphics;
 import eobject.Entity;
 import eobject.EvoObject;
 import environment.World;
+import eobject.Eye;
 import eobject.Food;
 import eobject.Sensor;
 import java.awt.BasicStroke;
@@ -86,6 +87,9 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
             
             if(eObj instanceof Entity){
                 Entity ent = (Entity) eObj;
+                this.centerViewportOnPoint(eObj.getLoc());
+                int[] newLoc = {(int) Math.round(ent.getLoc()[0]), (int) Math.round(ent.getLoc()[1])};
+                
 
                 ArrayList<Sensor> sensors = ent.getSensors();
                 
@@ -94,15 +98,46 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
                         int red = (int) Math.round(155*(s.getFade()/Sensor.FADE_START));
                         g2d.setColor(new Color(100+red,100,100));
                     }
-                    else{
-                        g2d.setColor(Color.DARK_GRAY);
-                    }
+
                     double[][] coords = s.getCoordinates();
                     double[] P1 = convertPointToViewport(coords[0]);
                     double[] P2 = convertPointToViewport(coords[1]);
                     g2d.setStroke(new BasicStroke(4));
                     g2d.drawLine((int) Math.round(P1[0]), (int) Math.round(P1[1]),(int)  Math.round(P2[0]),(int)  Math.round(P2[1]));
                     g2d.setStroke(new BasicStroke(1));
+                    g2d.setColor(Color.DARK_GRAY);
+                }
+                
+                for(Eye eye: ent.getEyes()){
+                    
+
+                    double[][][] vectors = eye.getVectors();
+                    int[][][] rounded = new int[2][2][2];
+                    
+                    double[] x = new double[2];
+                    double[] y = new double[2];
+                    for(int i=0; i<2; i++){
+                        double[] P1 = convertPointToViewport(vectors[i][0]);
+                        double[] P2 = convertPointToViewport(vectors[i][1]);
+
+                        x[i]=P2[0];
+                        y[i]=P2[0];
+
+                        g2d.drawLine((int) Math.round(P1[0]), (int) Math.round(P1[1]), (int) Math.round(P2[0]), (int) Math.round(P2[1]));
+                    }
+                    ent.getLoc();
+                    double[] aBC = {ent.getLoc()[0]-eye.getViewDistance(),ent.getLoc()[1]-eye.getViewDistance()};
+                    aBC = this.convertPointToViewport(aBC);
+                    int[] arcBoundingCorner = {(int) Math.round(aBC[0]),(int) Math.round(aBC[1])};
+                    int startAngle = (int) Math.round((eye.getAngle()-(eye.getSplitAngle()/2))-90);
+                    int arcAngle = (int) Math.round(eye.getSplitAngle());
+                    double dxytmp = eye.getViewDistance()*2;
+                    double[] dxytmparry = {dxytmp, dxytmp};
+                    dxytmparry = this.convertVectorToViewport(dxytmparry);
+                    int dxy = (int)Math.round(dxytmparry[0]);
+                    g2d.drawArc(arcBoundingCorner[0], arcBoundingCorner[1], dxy, dxy, startAngle, arcAngle);
+                    
+                    //g2d.drawString(eye.getViewAngle()[0]+"°", (float) sLoc[0]-50, (float) sLoc[1]+25);
                     
                 }
                 g2d.setColor(Color.BLACK);
@@ -115,7 +150,15 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
                 
             }
             if(eObj instanceof Food){
-                g2d.setColor(Color.BLUE);
+                if(((Food) eObj).isInVision()){
+                    g2d.setColor(Color.RED);
+                }
+                else if(((Food) eObj).isPoison()){
+                    g2d.setColor(Color.GREEN);
+                }
+                else{
+                    g2d.setColor(Color.BLUE);
+                }
                 sSize[0] = 10; sSize[1] = 10;
                 g2d.drawString(eObj.getName(), (float) sLoc[0]+10, (float) sLoc[1]-10);
                 Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
@@ -148,6 +191,12 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
             vec[2] = vec[2]*this.zoomPower;
             moveViewport(vec);
         }
+    }
+    public void centerViewportOnPoint(double[] loc){
+        int[] newLoc = new int[2];
+        newLoc[0] = (int) Math.round(loc[0] - this.WIDTH/2);
+        newLoc[1] = (int) Math.round(loc[1] - this.HEIGHT/2);
+        setViewport(newLoc);
     }
     public void moveViewport(int[] vec){
         int[] loc = vLoc;

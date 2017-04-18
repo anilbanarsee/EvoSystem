@@ -36,19 +36,42 @@ public class Evosystem {
         //w.addEntity(new Entity(loc,100));
         loc[1] = 200;
         
-        Entity e1 = new Entity(loc,25,500, w);
+        Entity e1 = new Entity(loc,25,5000, w);
         e1.setupDefaultSensors();
+        e1.setupDefaultEyes(2);
         
         Random r = new Random();
         
         int numFood = 30;
+        int numPoisonFood = 10;
+        boolean testing = false;
         
-        for(int i=0; i<numFood; i++){
-            int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
+        if(!testing){
+            for(int i=0; i<numFood; i++){
+                
+                int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
 
-            Food f = new Food(fLoc, 5);
-            f.setName("Food_"+i);
-            w.addObject(f);
+                Food f = new Food(fLoc, 5, false);
+                f.setName("Food_"+i);
+                w.addObject(f);
+            }
+            for(int i=0; i<numPoisonFood; i++){
+                
+                int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
+
+                Food f = new Food(fLoc, 5, true);
+                f.setName("Food_"+i);
+                w.addObject(f);
+            }
+        }
+        else
+        for(int i=0; i< 2000; i = i+50){
+            for(int j=0; j<2000; j=j+50){
+                int[] fLoc = {i,j};
+                Food f = new Food(fLoc, 5, false);
+                f.setName("Food_"+i+","+j);
+                w.addObject(f);
+            }
         }
         
         

@@ -17,9 +17,12 @@
 package eobject;
 
 import java.util.ArrayList;
+import org.encog.ml.MLRegression;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
 import org.encog.neural.neat.NEATNetwork;
+import org.encog.neural.neat.NEATPopulation;
+import simulation.TrainTest;
 
 /**
  *
@@ -28,9 +31,13 @@ import org.encog.neural.neat.NEATNetwork;
 public class EntityBrain {
     
     Entity entity;
-    NEATNetwork network;
+    MLRegression network;
     
     public EntityBrain(Entity e, NEATNetwork net){
+        entity = e;
+        this.network = net;
+    }
+    public EntityBrain(Entity e, NEATPopulation net){
         entity = e;
         this.network = net;
     }
@@ -38,23 +45,60 @@ public class EntityBrain {
     public int[] makeDecision(){
         
         ArrayList<Sensor> sensors = entity.getSensors();
+        ArrayList<Eye> eyes = entity.getEyes();
         
-        MLData inputData = new BasicMLData((sensors.size()*2)*(sensors.size()*2));
+        int numInputs = (sensors.size()*2)+(eyes.size()*3*TrainTest.EYE_TARGETS)+1;
+        
+        MLData inputData = new BasicMLData(numInputs);
         
         
         int index = 0;
         
-        for(int i=0; i<sensors.size(); i++){
+        for(Sensor s: sensors){
+            inputData.add(index,s.getFade());
+            index++;
+            inputData.add(index,s.getDistanceDetected());
+            index++;
+        }
+        for(Eye e: eyes){
+            double[] test = e.lastSeenAngle;
+            for(int i=0; i<e.MAX_TARGETS; i++){
+                inputData.add(index, e.lastSeenAngle[i]);
+                index++;
+                inputData.add(index, e.lastSeenDistance[i]);
+                index++;
+                if(e.isPoison[i]){
+                    inputData.add(index, 1);
+                }
+                else{
+                    inputData.add(index, 0);
+                }
+                index++;
+            }
+        }
+        
+        inputData.add(index, entity.hunger);
+        index++;
+        
+        
+       /* for(int i=0; i<numInputs; i++){
             
             for(int j=0; j<sensors.size(); j++){
                 
-                inputData.add(index, sensors.get(i).getFade());
+                inputData.add(index, sensors.get(j).getFade());
                 index++;
-                inputData.add(index, sensors.get(i).getDistanceDetected());
+                inputData.add(index, sensors.get(j).getDistanceDetected());
+                index++;
+            }
+            for(int j=0; j<eyes.size(); j++){
+                inputData.add(index, eyes.get(j).lastSeenAngle);
+                index++;
+                inputData.add(index, eyes.get(j).lastSeenDistance);
                 index++;
             }
             
-        }
+        }*/
+        
         
         /*for(Sensor s: sensors){
             
@@ -68,30 +112,14 @@ public class EntityBrain {
         
         MLData output = network.compute(inputData);
         
-        int[] movement = new int[4];
         
-        int counter = 0;
-        index = 0;
-        double v = 0;
+        int[] movement = new int[2];
+        double[] data = output.getData();
         
-        for(int i = 0; i<output.size(); i++){
-            
-            v = v+output.getData(i);
-            
-            if(counter==4){
-                v = v/4; 
-                movement[index] = (int) Math.round(v);
-                counter = 0;
-                v = 0;
-                index++;
-            }
-            else{
-                counter++;
-            }
-            
-            
-        
+        for(int i=0; i<movement.length; i++){
+            movement[i] = (int) Math.round((data[i]-0.5)*2);
         }
+        
         return movement;
         
     }

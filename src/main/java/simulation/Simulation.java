@@ -19,7 +19,9 @@ package simulation;
 import eobject.Entity;
 import environment.World;
 import eobject.EntityBrain;
+import eobject.Eye;
 import eobject.Food;
+import eobject.Sensor;
 import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import java.util.Random;
@@ -43,25 +45,39 @@ public class Simulation {
         Entity e1 = new Entity(loc, 25, 500, w);
         e1.setBrain(new EntityBrain(e1, (NEATNetwork) phenotype));
         e1.setName("Alpha");
-        e1.setupDefaultSensors();
+        e1.hungerCap = 500;
+        
+        //e1.setupDefaultEyes(TrainTest.EYE_TARGETS);
+        Eye eye = new Eye(e1, TrainTest.ENTITY_VIEW_DISTANCE, TrainTest.ENTITY_VIEW_DEGREE, 0, TrainTest.EYE_TARGETS);
+        //Sensor s = new Sensor(e1, 0, 300, Food.class);
+        e1.addEye(eye);
+        //e1.addSensor(s);
         w.addObject(e1);
         
-        int numFood = 30;
+        int numFood = TrainTest.FOOD_COUNT;
+        int numPoisonFood = TrainTest.POISON_COUNT;
         
         Random r = new Random();
         
         for(int i=0; i<numFood; i++){
             int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
 
-            Food f = new Food(fLoc, 5);
+            Food f = new Food(fLoc, 5, false);
+            f.setName("Food_"+i);
+            w.addObject(f);
+        }
+        for(int i=0; i<numPoisonFood; i++){
+            int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
+
+            Food f = new Food(fLoc, 5, true);
             f.setName("Food_"+i);
             w.addObject(f);
         }
         
-        int numTicks = 10000;
+        int numTicks = 50000;
         int i=0;
         for(i=0; i<numTicks; i++){
-            
+
             w.tick();
             if(e1.isDead()){
                 break;
