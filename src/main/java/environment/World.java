@@ -5,6 +5,7 @@
  */
 package environment;
 
+import eobject.DropZone;
 import eobject.Entity;
 import eobject.EvoObject;
 import eobject.Food;
@@ -15,9 +16,17 @@ import util.MathUtils;
  *
  * @author General
  */
+
+
 public class World {
     
+    
+    
+    public static final int FOOD_COLLECTION = 0;
+    public static final int RESOURCE_GATHERING = 1;
 
+    public static int gameMode = 0;
+    
     private ArrayList<EvoObject> eObjects;
     private ArrayList<Entity> graveyard;
 
@@ -97,7 +106,7 @@ public class World {
             x++;
             //System.out.print(x +" :");
             double[] loc = eObj.getLoc();
-            int[] size = eObj.getSize();
+            double[] size = eObj.getSize();
             if(MathUtils.between(loc[0], p1[0], p2[0])){
                 if(MathUtils.between(loc[1],p1[1],p2[1]))
                     eObjs.add(eObj);
@@ -194,30 +203,103 @@ public class World {
         for(EvoObject e: eObjects){
             if(e instanceof Food){
                 ((Food) e).setInVision(false);
+             
             }
             if(e instanceof Entity){
                 Entity ent = (Entity) e;
+                
                 if(!ent.tick()){
                     bin.add(e);
                     graveyard.add(ent);
                     ent.setDead(true);
                 }
+                
+                
+                if(ent.eating && gameMode == FOOD_COLLECTION ){
+                    
+                    if(ent.isHoldingFood()){
+                        if(ent.holding.isPoison()){
+                            ent.modHunger(-ent.holding.getValue());
+                        }
+                        else{
+                            ent.modHunger(ent.holding.getValue());
+                        }
+                        ent.destroyFood();
+                        
+                    }
+                    else{
+                        ent.modHunger(-25);
+                    }
+                    ent.eating = false;
+                }
+                
                 ArrayList<EvoObject> eObjs = this.getObjectsInRadius(ent.getLoc(), ent.getRadius());
+                
                 for(EvoObject eb: eObjs){
                     if(eb instanceof Food){
                        Food f = (Food) eb;
-                       bin.add(eb);
+                       
+                       if(!ent.isHoldingFood()){
+                            bin.add(eb);
+                            ent.holdFood(f);
+                       }
+                      /* bin.add(eb);
                        if(!f.isPoison()){
-                           ent.modHunger(500);
-                           
+                           ent.modHunger(f.getValue());
                        }
                        else{
-                           ent.modScore(-5000);
                            ent.modHunger(-500);
-                       }
+                          
+                       }*/
                     }
+
+                    
+                   
                 }
-                ent.modHunger(-1);
+                
+                if(gameMode==FOOD_COLLECTION){
+                    ent.modHunger(-1);
+                    ent.modScore(1);
+                }
+               
+                if(gameMode == RESOURCE_GATHERING){
+                    DropZone dz = ent.getDropZone();
+                    if(ent.dropping && ent.isHoldingFood()){
+                        ent.modHunger(100);
+                        double dx = ent.getDistanceToDropZone();
+                        if(dx<dz.getRadius()){
+                        
+                            
+                            ent.modScore(1000);
+                            
+                            
+                        }
+                        else{
+                            ent.modScore((int)Math.round(dx/2));
+                        }
+                        ent.destroyFood();
+                        ent.dropping = false;
+                    }
+                    else if(ent.dropping && !ent.isHoldingFood()){
+                        ent.modHunger(-25);
+                        ent.dropping = false;
+                    }
+                   
+
+                    
+                }
+                if(ent.dropping ){
+                    if(ent.isHoldingFood()){
+                        ent.destroyFood();
+                    }
+                    else{
+                        ent.modHunger(-25);
+                    }
+                        
+                    ent.dropping = false;
+                }
+                ent.eating = false;
+                ent.dropping = false;
             }
            
         }

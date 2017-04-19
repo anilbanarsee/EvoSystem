@@ -45,10 +45,10 @@ import org.encog.persist.EncogDirectoryPersistence;
  */
 public class TrainTest {
     
-    public static final int EYE_TARGETS = 1;
+    public static final int EYE_TARGETS = 3;
     public static final int EYE_COUNT = 1;
     public static final int FOOD_COUNT = 30;
-    public static final int POISON_COUNT = 30;
+    public static final int POISON_COUNT = 10;
     public static final int SENSOR_COUNT = 0;
     public static final int ENTITY_VIEW_DEGREE = 90;
     public static final int ENTITY_VIEW_DISTANCE = 500;
@@ -97,14 +97,12 @@ public class TrainTest {
         frame.add(panel);
         */
         
-        int inputCount = (SENSOR_COUNT*2)+(EYE_COUNT*EYE_TARGETS*3)+1;
+        int inputCount = (SENSOR_COUNT*2)+(EYE_COUNT*EYE_TARGETS*3)+4;
         
-        Substrate substrate = SubstrateFactory.factorSandwichSubstrate(inputCount, 4);
-        System.out.println(substrate.getInputCount());
-        System.out.println(substrate.getOutputCount());
+
         EntityScore score = new EntityScore();
         
-        NEATPopulation pop = new NEATPopulation(2,2, 500);
+        NEATPopulation pop = new NEATPopulation(inputCount,3, 500);
         System.out.println("Is hyper :"+pop.isHyperNEAT());
         pop.setActivationCycles(4);
         pop.setSurvivalRate(50);

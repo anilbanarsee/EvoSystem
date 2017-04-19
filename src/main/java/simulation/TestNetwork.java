@@ -17,6 +17,7 @@
 package simulation;
 
 import environment.World;
+import eobject.DropZone;
 import eobject.Entity;
 import eobject.EntityBrain;
 import eobject.Eye;
@@ -46,6 +47,7 @@ public class TestNetwork {
        
         NEATPopulation pop = (NEATPopulation) EncogDirectoryPersistence.loadObject(new File(filepath));
         
+        System.out.println(Simulation.simulate(pop));
       
         System.out.println("Output Count : "+((NEATNetwork) pop.getCODEC().decode(pop.getBestGenome())).getOutputCount());
         World w = new World();
@@ -71,6 +73,10 @@ public class TestNetwork {
         e1.setBrain(new EntityBrain(e1,pop));
         e1.hungerCap = 500;
         
+        int[] dzLoc = {0,50};
+        DropZone dz = new DropZone(dzLoc,300);
+        w.addObject(dz);
+        
         Random r = new Random();
         
         int numFood = TrainTest.FOOD_COUNT;
@@ -79,14 +85,14 @@ public class TestNetwork {
         for(int i=0; i<numFood; i++){
             int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
 
-            Food f = new Food(fLoc, 5, false);
+            Food f = new Food(fLoc, 5, false, 500);
             f.setName("Food_"+i);
             w.addObject(f);
         }
         for(int i=0; i<numPoisonFood; i++){
             int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
 
-            Food f = new Food(fLoc, 5, true);
+            Food f = new Food(fLoc, 5, true, 500);
             f.setName("Food_"+i+" (P)");
             w.addObject(f);
         }
@@ -99,7 +105,7 @@ public class TestNetwork {
             }
         }*/
         
-        
+        e1.setDropZone(dz);
         w.addObject(e1);
         e1.setName("Entity_1");
         JFrame frame = new JFrame();

@@ -18,6 +18,7 @@ package simulation;
 
 import eobject.Entity;
 import environment.World;
+import eobject.DropZone;
 import eobject.EntityBrain;
 import eobject.Eye;
 import eobject.Food;
@@ -28,6 +29,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.encog.ml.MLMethod;
+import org.encog.ml.MLRegression;
 import org.encog.neural.neat.NEATNetwork;
 
 /**
@@ -37,13 +39,13 @@ import org.encog.neural.neat.NEATNetwork;
 public class Simulation {
     
     
-    public static int simulate(MLMethod phenotype){
+    public static int simulate(MLRegression network){
         
         World w = new World();
         int[] loc = {200,200};
         
         Entity e1 = new Entity(loc, 25, 500, w);
-        e1.setBrain(new EntityBrain(e1, (NEATNetwork) phenotype));
+        e1.setBrain(new EntityBrain(e1, network));
         e1.setName("Alpha");
         e1.hungerCap = 500;
         
@@ -53,6 +55,10 @@ public class Simulation {
         e1.addEye(eye);
         //e1.addSensor(s);
         w.addObject(e1);
+        int[] dzLoc = {0,50};
+        DropZone dz = new DropZone(dzLoc,300);
+        w.addObject(dz);
+        e1.setDropZone(dz);
         
         int numFood = TrainTest.FOOD_COUNT;
         int numPoisonFood = TrainTest.POISON_COUNT;
@@ -62,19 +68,24 @@ public class Simulation {
         for(int i=0; i<numFood; i++){
             int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
 
-            Food f = new Food(fLoc, 5, false);
+            Food f = new Food(fLoc, 5, false, 500);
             f.setName("Food_"+i);
             w.addObject(f);
         }
         for(int i=0; i<numPoisonFood; i++){
             int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
 
-            Food f = new Food(fLoc, 5, true);
+            Food f = new Food(fLoc, 5, true, 500);
             f.setName("Food_"+i);
             w.addObject(f);
         }
-        
-        int numTicks = 50000;
+        int numTicks;
+        if(World.gameMode==World.FOOD_COLLECTION){
+            numTicks = 30000;
+        }
+        else{
+            numTicks = 2500;
+        }
         int i=0;
         for(i=0; i<numTicks; i++){
 

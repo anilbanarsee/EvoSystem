@@ -8,6 +8,7 @@ package graphics;
 import eobject.Entity;
 import eobject.EvoObject;
 import environment.World;
+import eobject.DropZone;
 import eobject.Eye;
 import eobject.Food;
 import eobject.Sensor;
@@ -80,7 +81,7 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         for(EvoObject eObj : eObjects){
             double[] sLoc = convertPointToViewport(eObj.getLoc());
             
-            double[] sSize = {50,50};
+            double[] sSize = {eObj.getSize()[0],eObj.getSize()[1]};
             sSize = convertVectorToViewport(sSize);
             
             //System.out.println(Arrays.toString(sSize));
@@ -89,8 +90,15 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
                 Entity ent = (Entity) eObj;
                 this.centerViewportOnPoint(eObj.getLoc());
                 int[] newLoc = {(int) Math.round(ent.getLoc()[0]), (int) Math.round(ent.getLoc()[1])};
-                
-
+                //g2d.drawString("Angle to DZ: "+ent.getAngleToDropZone(), 20, 20);
+                g2d.drawString("Score: "+ent.getScore(), 20, 100);
+                if(ent.getBrain()!=null){
+                    int[] des = ent.getBrain().makeDecision();
+                    g2d.drawString(des[0]+","+des[1]+","+des[2], 20, 200);
+                }
+                g2d.drawString(Math.round(ent.getLoc()[0])+"", 20, 150);
+                g2d.drawString(Math.round(ent.getLoc()[1])+"", 20, 180);
+                 
                 ArrayList<Sensor> sensors = ent.getSensors();
                 
                 for(Sensor s: sensors){
@@ -165,9 +173,23 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
                 g2d.fill(circle);
                 g2d.setColor(Color.DARK_GRAY);
             }
+            
+            if(eObj instanceof DropZone){
+                g2d.setColor(Color.ORANGE);
+                Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
+                g2d.drawString(((DropZone) eObj).numDropped+"", (float) sLoc[0], (float) sLoc[1]);
+                g2d.fill(circle);
+                g2d.setColor(Color.DARK_GRAY);
+            }
+           
 
             
           //  System.out.println(Arrays.toString(sLoc)+" : "+eObj);
+        }
+        for(EvoObject eobj: w.getGraveyard()){
+            if(eobj instanceof Entity){
+                g2d.drawString("Score :"+((Entity) eobj).getScore()+"", 50, 50);
+            }
         }
        
     }

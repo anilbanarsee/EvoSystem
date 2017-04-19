@@ -33,7 +33,7 @@ public class EntityScore implements CalculateScore{
     @Override
     public double calculateScore(MLMethod phenotype) {
         
-        return Simulation.simulate(phenotype);
+        return Simulation.simulate((NEATNetwork) phenotype);
         
         
     }

@@ -23,6 +23,9 @@ import org.encog.ml.data.basic.BasicMLData;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.NEATPopulation;
 import simulation.TrainTest;
+import static simulation.TrainTest.EYE_COUNT;
+import static simulation.TrainTest.EYE_TARGETS;
+import static simulation.TrainTest.SENSOR_COUNT;
 
 /**
  *
@@ -33,21 +36,17 @@ public class EntityBrain {
     Entity entity;
     MLRegression network;
     
-    public EntityBrain(Entity e, NEATNetwork net){
+    public EntityBrain(Entity e, MLRegression net){
         entity = e;
         this.network = net;
     }
-    public EntityBrain(Entity e, NEATPopulation net){
-        entity = e;
-        this.network = net;
-    }
-    
+
     public int[] makeDecision(){
         
         ArrayList<Sensor> sensors = entity.getSensors();
         ArrayList<Eye> eyes = entity.getEyes();
         
-        int numInputs = (sensors.size()*2)+(eyes.size()*3*TrainTest.EYE_TARGETS)+1;
+        int numInputs = (SENSOR_COUNT*2)+(EYE_COUNT*EYE_TARGETS*3)+4;
         
         MLData inputData = new BasicMLData(numInputs);
         
@@ -68,18 +67,33 @@ public class EntityBrain {
                 inputData.add(index, e.lastSeenDistance[i]);
                 index++;
                 if(e.isPoison[i]){
-                    inputData.add(index, 1);
+                    inputData.add(index, 2);
                 }
                 else{
-                    inputData.add(index, 0);
+                    inputData.add(index, 1);
                 }
                 index++;
+
             }
         }
-        
+        if(entity.isHoldingFood()){
+            if(entity.holding.isPoison){
+                inputData.add(index, 2);
+            }
+            else{
+                inputData.add(index, 1);
+            }
+        }
+        else{
+            inputData.add(index, 0);
+        }
+        index++;
         inputData.add(index, entity.hunger);
         index++;
-        
+        inputData.add(index, entity.getAngleToDropZone());
+        index++;
+        inputData.add(index, entity.getDistanceToDropZone());
+        index++;
         
        /* for(int i=0; i<numInputs; i++){
             
@@ -113,7 +127,7 @@ public class EntityBrain {
         MLData output = network.compute(inputData);
         
         
-        int[] movement = new int[2];
+        int[] movement = new int[3];
         double[] data = output.getData();
         
         for(int i=0; i<movement.length; i++){

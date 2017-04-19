@@ -11,7 +11,7 @@ package eobject;
  */
 public class EvoObject {
     protected double[] location;
-    protected int[] size;
+    protected double[] size;
     protected float radius;
     protected String name = "";
     
@@ -19,9 +19,9 @@ public class EvoObject {
         location = new double[2];
         location[0] = loc[0];
         location[1] = loc[1];
-        size = new int[2];
-        size[0] = 50;
-        size[1] = 50;
+        size = new double[2];
+        size[0] = radius*2;
+        size[1] = radius*2;
         this.radius = radius;
     }
         public void setName(String name){
@@ -33,7 +33,7 @@ public class EvoObject {
     public double[] getLoc(){
         return location;
     }
-    public int[] getSize(){
+    public double[] getSize(){
         return size;
     }
     public boolean tick(){

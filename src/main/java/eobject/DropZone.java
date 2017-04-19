@@ -20,32 +20,15 @@ package eobject;
  *
  * @author Reetoo
  */
-public class Food extends EvoObject{
+public class DropZone extends EvoObject{
 
-    boolean inVision;
-    boolean isPoison;
-    int foodValue;
+    public int numDropped = 0;
     
-    public Food(int[] loc, float radius, boolean isPoison, int foodValue) {
+    public DropZone(int[] loc, float radius) {
         super(loc, radius);
-        this.isPoison = isPoison;
-        this.foodValue = foodValue;
     }
-    public int getValue(){
-        return foodValue;
+    public void increment(int n){
+        numDropped+=n;
     }
-    public void setInVision(boolean set){
-        inVision = set;
-    }
-    public boolean isInVision(){
-        return inVision;
-    }
-    public boolean isPoison(){
-        return isPoison;
-    }
-    public String toString(){
-        return name;
-    }
-    
     
 }

@@ -7,6 +7,8 @@ package evosystem;
 
 import eobject.Entity;
 import environment.World;
+import eobject.DropZone;
+import eobject.EntityController;
 import eobject.Food;
 import framework.Processor;
 import graphics.MoveController;
@@ -15,6 +17,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import util.MathUtils;
 
 /**
  *
@@ -46,12 +49,17 @@ public class Evosystem {
         int numPoisonFood = 10;
         boolean testing = false;
         
+                int[] dzLoc = {0,50};
+        DropZone dz = new DropZone(dzLoc,300);
+        w.addObject(dz);
+        
         if(!testing){
+            
             for(int i=0; i<numFood; i++){
                 
                 int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
-
-                Food f = new Food(fLoc, 5, false);
+                
+                Food f = new Food(fLoc, 5, false, 500);
                 f.setName("Food_"+i);
                 w.addObject(f);
             }
@@ -59,23 +67,25 @@ public class Evosystem {
                 
                 int[] fLoc = {loc[0]+(r.nextInt(1000)-200),loc[1]+(r.nextInt(1000)-200)};
 
-                Food f = new Food(fLoc, 5, true);
+                Food f = new Food(fLoc, 5, true, 500);
                 f.setName("Food_"+i);
                 w.addObject(f);
             }
         }
-        else
-        for(int i=0; i< 2000; i = i+50){
-            for(int j=0; j<2000; j=j+50){
-                int[] fLoc = {i,j};
-                Food f = new Food(fLoc, 5, false);
-                f.setName("Food_"+i+","+j);
-                w.addObject(f);
+        else{
+            for(int i=0; i< 2000; i = i+50){
+                for(int j=0; j<2000; j=j+50){
+                    int[] fLoc = {i,j};
+                    Food f = new Food(fLoc, 5, false, 500);
+                    f.setName("Food_"+i+","+j);
+                    w.addObject(f);
+                }
             }
         }
-        
+
         
         w.addObject(e1);
+        e1.setDropZone(dz);
         e1.setName("Entity_1");
         JFrame frame = new JFrame();
         frame.setSize(500,500);
@@ -84,9 +94,11 @@ public class Evosystem {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         MoveController mc = new MoveController('a','w','d','s');
-        MoveController entityControl = new MoveController();
+
+        EntityController entityControl = new EntityController('v','b');
         wp.setMoveController(mc);
         e1.setController(entityControl);
+        
         frame.addKeyListener(entityControl);
         frame.addKeyListener(mc);
         
