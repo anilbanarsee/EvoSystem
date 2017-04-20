@@ -35,12 +35,27 @@ public class EntityBrain {
     
     Entity entity;
     MLRegression network;
+    public double[] lastInput;
+    public double[] lastOutput;
+    int inputCount;
+    int outputCount;
     
     public EntityBrain(Entity e, MLRegression net){
         entity = e;
         this.network = net;
+        inputCount = net.getInputCount();
+        outputCount = net.getOutputCount();
+        lastInput = new double[inputCount];
+        lastOutput = new double[outputCount];
     }
-
+    
+    public int getInputCount(){
+        return inputCount;
+    }
+    public int getOutputCount(){
+        return outputCount;
+    }
+    
     public int[] makeDecision(){
         
         ArrayList<Sensor> sensors = entity.getSensors();
@@ -123,6 +138,7 @@ public class EntityBrain {
             i++;
         }*/
         
+        lastInput = inputData.getData();
         
         MLData output = network.compute(inputData);
         
@@ -130,9 +146,13 @@ public class EntityBrain {
         int[] movement = new int[3];
         double[] data = output.getData();
         
+        lastOutput = data;
+        
         for(int i=0; i<movement.length; i++){
             movement[i] = (int) Math.round((data[i]-0.5)*2);
         }
+        
+        
         
         return movement;
         

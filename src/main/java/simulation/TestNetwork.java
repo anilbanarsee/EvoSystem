@@ -24,6 +24,7 @@ import eobject.Eye;
 import eobject.Food;
 import eobject.Sensor;
 import framework.Processor;
+import graphics.MainFrame;
 import graphics.MoveController;
 import graphics.WorldPanel;
 import java.io.File;
@@ -108,19 +109,19 @@ public class TestNetwork {
         e1.setDropZone(dz);
         w.addObject(e1);
         e1.setName("Entity_1");
-        JFrame frame = new JFrame();
-        frame.setSize(500,500);
-        frame.setVisible(true);
-        frame.add(wp);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        MoveController mc = new MoveController('a','w','d','s');
-        
-        wp.setMoveController(mc);
 
-        frame.addKeyListener(mc);
         
-        Thread mainThread = new Thread(new Processor(w, wp));
+        
+        Processor p = new Processor(w);
+        
+        
+        
+        Thread mainThread = new Thread(p);
+        
+        MainFrame frame = new MainFrame(wp, p);
+        
+        p.setMainFrame(frame);
+        
         mainThread.start();
         Thread panelThread = new Thread(wp);
         panelThread.start();

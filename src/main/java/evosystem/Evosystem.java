@@ -11,6 +11,7 @@ import eobject.DropZone;
 import eobject.EntityController;
 import eobject.Food;
 import framework.Processor;
+import graphics.MainFrame;
 import graphics.MoveController;
 import graphics.WorldPanel;
 import java.util.Random;
@@ -87,22 +88,34 @@ public class Evosystem {
         w.addObject(e1);
         e1.setDropZone(dz);
         e1.setName("Entity_1");
-        JFrame frame = new JFrame();
+       /* JFrame frame = new JFrame();
         frame.setSize(500,500);
         frame.setVisible(true);
         frame.add(wp);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        MoveController mc = new MoveController('a','w','d','s');
+        */
+
+        //MoveController mc = new MoveController('a','w','d','s');
 
         EntityController entityControl = new EntityController('v','b');
-        wp.setMoveController(mc);
+        //wp.setMoveController(mc);
         e1.setController(entityControl);
         
-        frame.addKeyListener(entityControl);
-        frame.addKeyListener(mc);
         
-        Thread mainThread = new Thread(new Processor(w, wp));
+        //frame.addKeyListener(mc);
+        
+        Processor p = new Processor(w);
+        
+        
+        
+        Thread mainThread = new Thread(p);
+        
+        MainFrame frame = new MainFrame(wp, p);
+        
+        frame.addKeyListener(entityControl);
+        
+        p.setMainFrame(frame);
+        
         mainThread.start();
         Thread panelThread = new Thread(wp);
         panelThread.start();

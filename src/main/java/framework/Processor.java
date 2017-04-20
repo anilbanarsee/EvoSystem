@@ -6,6 +6,7 @@
 package framework;
 
 import environment.World;
+import graphics.MainFrame;
 import graphics.WorldPanel;
 import static java.lang.Thread.sleep;
 import java.util.logging.Level;
@@ -17,15 +18,19 @@ import javax.swing.JFrame;
  * @author General
  */
 public class Processor implements Runnable{
-    private final int fps = 60;
+    public final int fps = 60;
+    public double timeFactor = 1;
     private final World world;
+    private MainFrame mframe;
    
     
-    public Processor(World w, WorldPanel wp){
+    public Processor(World w){
         world = w;
-       
+        mframe = null;
     }
-
+    public void setMainFrame(MainFrame mframe){
+        this.mframe = mframe;
+    }
     @Override
     public void run() {
            
@@ -40,12 +45,17 @@ public class Processor implements Runnable{
             
             time = newTime;
             try {
-                sleep((1000-timeDiff)/fps);
+                sleep(Math.round((1000-timeDiff)/(fps*timeFactor)));
+                //System.out.println(timeFactor);
+
             } catch (InterruptedException ex) {
                 Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             world.tick();
+            if(mframe!=null){
+                mframe.refresh();
+            }
             //int[] vec = {1,1};
             
             //world.tick();

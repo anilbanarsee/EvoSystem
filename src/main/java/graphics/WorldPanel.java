@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
+import util.MathUtils;
 
 /**
  *
@@ -34,12 +35,13 @@ import javax.swing.JPanel;
  */
 public class WorldPanel extends JPanel implements Runnable, ComponentListener{
     
-    int[] vSize;
+    double[] vSize;
     int[] vLoc;
     int movePower = 2;
     int zoomPower = 5;
     public int WIDTH = 500;
     public int HEIGHT = 500;
+    double zoom = 1;
     private MoveController mc;
     ArrayList<EvoObject> eObjects;
     World w;
@@ -47,7 +49,7 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
     public WorldPanel(World w){
         eObjects = new ArrayList<EvoObject>();
         this.w = w;
-        vSize = new int[2];
+        vSize = new double[2];
         vSize[0] = WIDTH;
         vSize[1] = HEIGHT;
         vLoc = new int[2];
@@ -64,7 +66,27 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         
         return sLoc;
     }
+    public double[] convertViewpointToReal(double[] vec){
+            
+        double[] sLoc = new double[2];
+        sLoc[0] = vec[0];
+        sLoc[1] = vec[1];
+        sLoc[0] = (int) Math.round(sLoc[0]/(this.getWidth()/(vSize[0]+0.0)));
+        sLoc[1] = (int) Math.round(sLoc[1]/(this.getHeight()/(vSize[1]+0.0)));
+        sLoc[0] += vLoc[0];
+        sLoc[1] += vLoc[1];
+        
+        return sLoc;
+    }
     public double[] convertVectorToViewport(double[] vec){
+        double[] V = {vec[0], vec[1]};
+        
+        V[0] = (int) Math.round(V[0]*(this.getWidth()/(vSize[0]+0.0)));
+        V[1] = (int) Math.round(V[1]*(this.getHeight()/(vSize[1]+0.0)));
+        
+        return V;
+    }
+    public double[] convertScalarToViewport(double[] vec){
         double[] V = {vec[0], vec[1]};
         
         V[0] = (int) Math.round(V[0]*(this.getWidth()/(vSize[0]+0.0)));
@@ -74,7 +96,7 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
     }
     @Override
     public void paintComponent(Graphics g){
-       // System.out.println(this.getWidth());
+      
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         
@@ -84,11 +106,12 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
             double[] sSize = {eObj.getSize()[0],eObj.getSize()[1]};
             sSize = convertVectorToViewport(sSize);
             
-            //System.out.println(Arrays.toString(sSize));
+           
+            
             
             if(eObj instanceof Entity){
                 Entity ent = (Entity) eObj;
-                this.centerViewportOnPoint(eObj.getLoc());
+                //this.centerViewportOnPoint(eObj.getLoc());
                 int[] newLoc = {(int) Math.round(ent.getLoc()[0]), (int) Math.round(ent.getLoc()[1])};
                 //g2d.drawString("Angle to DZ: "+ent.getAngleToDropZone(), 20, 20);
                 g2d.drawString("Score: "+ent.getScore(), 20, 100);
@@ -153,8 +176,8 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
                 g2d.fill(circle);
                 g2d.drawString("Hunger :"+ent.getHunger(), (float) sLoc[0]+25,  (float) sLoc[1]-25);
                 g2d.drawString("Angle :"+ent.getAngle(), (float)sLoc[0]+25, (float)sLoc[1]+25);
-                circle = new Ellipse2D.Double((sLoc[0])+(50*Math.sin(Math.toRadians(ent.getAngle()))), (sLoc[1])+(50*Math.cos(Math.toRadians(ent.getAngle()))), 5, 5);
-                g2d.fill(circle);
+                //circle = new Ellipse2D.Double((sLoc[0])+(50*Math.sin(Math.toRadians(ent.getAngle()))), (sLoc[1])+(50*Math.cos(Math.toRadians(ent.getAngle()))), 5, 5);
+                //g2d.fill(circle);
                 
             }
             if(eObj instanceof Food){
@@ -168,15 +191,16 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
                     g2d.setColor(Color.BLUE);
                 }
                 sSize[0] = 10; sSize[1] = 10;
+                sSize = this.convertVectorToViewport(sSize);
                 g2d.drawString(eObj.getName(), (float) sLoc[0]+10, (float) sLoc[1]-10);
-                Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
+                Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[1]/2), sSize[0], sSize[1]);
                 g2d.fill(circle);
                 g2d.setColor(Color.DARK_GRAY);
             }
             
             if(eObj instanceof DropZone){
                 g2d.setColor(Color.ORANGE);
-                Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[0]/2), sSize[0], sSize[1]);
+                Ellipse2D.Double circle = new Ellipse2D.Double(sLoc[0]-(sSize[0]/2), sLoc[1]-(sSize[1]/2), sSize[0], sSize[1]);
                 g2d.drawString(((DropZone) eObj).numDropped+"", (float) sLoc[0], (float) sLoc[1]);
                 g2d.fill(circle);
                 g2d.setColor(Color.DARK_GRAY);
@@ -184,7 +208,7 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
            
 
             
-          //  System.out.println(Arrays.toString(sLoc)+" : "+eObj);
+         
         }
         for(EvoObject eobj: w.getGraveyard()){
             if(eobj instanceof Entity){
@@ -193,7 +217,20 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         }
        
     }
-
+    public Entity getEntity(int x, int y){
+        double[] mLoc = {x,y};
+        System.out.println(x+","+y);
+        mLoc = this.convertViewpointToReal(mLoc);
+        for(EvoObject eObj:w.getObjects()){
+            if(eObj instanceof Entity){
+                double debug = MathUtils.getDistanceBetween(mLoc, eObj.getLoc());
+                if(eObj.getRadius()>=MathUtils.getDistanceBetween(mLoc, eObj.getLoc())){
+                    return (Entity) eObj;
+                }
+            }
+        }
+        return null;
+    }
     public void setMoveController(MoveController mc){
         this.mc = mc;
     }
@@ -225,7 +262,12 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         loc[0] += vec[0];
         loc[1] += vec[1];
         
-        if(vec[2]<0){
+        double zoomRate = 0.0025;
+        zoom += zoomRate*vec[2];
+        if(zoom<=0){
+            zoom = zoomRate;
+        }
+        /*if(vec[2]<0){
             if(vSize[0]+vec[2]<0){
                 vec[2] = -vSize[0]+2;
                 
@@ -235,10 +277,14 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
             }
             
             
-        }
+        }*/
         
-        vSize[0]+=vec[2];
-        vSize[1]+=vec[2];
+       // vSize[0]+=(vec[2]*zoomRate*vSize[0]);
+       // vSize[1]+=(vec[2]*zoomRate*vSize[1]);
+        vSize[0] = WIDTH*zoom;
+        vSize[1] = HEIGHT*zoom;
+        
+        
         loc[0] -= vec[2]/2;
         loc[1] -= vec[2]/2;
         
@@ -251,8 +297,8 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
         vLoc = loc;
         int[] p1 = loc;
         int[] p2 = new int[2];
-        p2[0] = p1[0]+vSize[0];
-        p2[1] = p1[1]+vSize[1];
+        p2[0] = (int) Math.round(p1[0]+vSize[0]);
+        p2[1] = (int) Math.round(p1[1]+vSize[1]);
         
         eObjects = w.getObjectsInArea(p1, p2);
         
@@ -266,8 +312,9 @@ public class WorldPanel extends JPanel implements Runnable, ComponentListener{
     public void componentResized(ComponentEvent e) {
         HEIGHT = e.getComponent().getHeight();
         WIDTH = e.getComponent().getWidth();
-        vSize[0] = WIDTH;
-        vSize[1] = HEIGHT;
+        vSize[0] = WIDTH*zoom;
+        vSize[1] = HEIGHT*zoom;
+        ;
     }
 
     @Override

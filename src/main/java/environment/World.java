@@ -228,7 +228,7 @@ public class World {
                         
                     }
                     else{
-                        ent.modHunger(-25);
+                        //ent.modHunger(-25);
                     }
                     ent.eating = false;
                 }
@@ -290,10 +290,11 @@ public class World {
                 }
                 if(ent.dropping ){
                     if(ent.isHoldingFood()){
+                   
                         ent.destroyFood();
                     }
                     else{
-                        ent.modHunger(-25);
+                        //ent.modHunger(-25);
                     }
                         
                     ent.dropping = false;

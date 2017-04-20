@@ -48,7 +48,7 @@ public class TrainTest {
     public static final int EYE_TARGETS = 3;
     public static final int EYE_COUNT = 1;
     public static final int FOOD_COUNT = 30;
-    public static final int POISON_COUNT = 10;
+    public static final int POISON_COUNT = 30;
     public static final int SENSOR_COUNT = 0;
     public static final int ENTITY_VIEW_DEGREE = 90;
     public static final int ENTITY_VIEW_DISTANCE = 500;

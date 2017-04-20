@@ -232,9 +232,9 @@ public class Entity extends EvoObject {
         location[1] += dy;
         
         if(vec[2]==1){
-            if(this.isHoldingFood()){
-                this.eating = true;
-            }
+           
+            this.eating = true;
+            
         }
         else if(vec[2] == -1){
             this.dropping = true;
